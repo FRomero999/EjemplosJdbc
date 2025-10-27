@@ -134,5 +134,114 @@ public class VideoJuegoDAO implements DAO<VideoJuego> {
         return Optional.empty();
     }
 
+    /* Métodos tipicos de repositorio - Capa de negocio */
+
+    public Optional<VideoJuego> saveOrUpdate(VideoJuego videojuego){
+        if(exists(videojuego)) return update(videojuego);
+        else return save(videojuego);
+
+    }
+
+    public Boolean exists(VideoJuego videojuego){
+        return (findById(videojuego.getId()).isPresent());
+    }
+
+    public Optional<VideoJuego> deleteById(Integer id){
+        Optional<VideoJuego> juego = findById(id);
+        /* return Optional.ofNullable( delete( juego.get() ).get() );*/
+        if( juego.isPresent()) return( delete(juego.get()) );
+        else return Optional.empty();
+    }
+
+    /* Métodos adicionales de lectura - Queries */
+
+    public Optional<VideoJuego> findByNombre(String nombre){
+        try(Connection conn = dataSource.getConnection()){
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM videojuegos WHERE nombre = ?");
+            stmt.setString(1, nombre);
+            ResultSet resultado = stmt.executeQuery();
+            if(resultado.next()){
+                VideoJuego videojuego = new VideoJuego();
+                videojuego.setId(resultado.getInt(1));
+                videojuego.setNombre(resultado.getString("nombre"));
+                videojuego.setDesarrollador(resultado.getString(3));
+                videojuego.setPlataforma(resultado.getString("plataforma"));
+                videojuego.setAño(resultado.getInt(4));
+                videojuego.setGenero(resultado.getString(5));
+                return Optional.of(videojuego);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return Optional.empty();
+    }
+
+    public List<VideoJuego> findAllByPlataforma(String plataforma){
+
+        ArrayList<VideoJuego> listado = new ArrayList<>();
+        String sql = "SELECT * FROM videojuegos WHERE plataforma = ?";
+        try(Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+        ){
+            stmt.setString(1, plataforma);
+            ResultSet resultado = stmt.executeQuery();
+            while(resultado.next()){
+                VideoJuego videojuego = new VideoJuego();
+                videojuego.setId(resultado.getInt(1));
+                videojuego.setNombre(resultado.getString("nombre"));
+                videojuego.setDesarrollador(resultado.getString(3));
+                videojuego.setPlataforma(resultado.getString("plataforma"));
+                videojuego.setAño(resultado.getInt(4));
+                videojuego.setGenero(resultado.getString(5));
+                listado.add(videojuego);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return listado;
+    }
+
+    public List<VideoJuego> findAllByNombreContaining(String nombre){
+        var salida = new ArrayList<VideoJuego>();
+        try(Connection conn = dataSource.getConnection()){
+            PreparedStatement stmt = conn.prepareStatement("SELECT * FROM videojuegos WHERE nombre LIKE ? ");
+            stmt.setString(1, "%"+nombre+"%");
+            ResultSet resultado = stmt.executeQuery();
+            while(resultado.next()){
+                VideoJuego videojuego = new VideoJuego();
+                videojuego.setId(resultado.getInt(1));
+                videojuego.setNombre(resultado.getString("nombre"));
+                videojuego.setDesarrollador(resultado.getString(3));
+                videojuego.setPlataforma(resultado.getString("plataforma"));
+                videojuego.setAño(resultado.getInt(4));
+                videojuego.setGenero(resultado.getString(5));
+                salida.add(videojuego);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return salida;
+    }
+
+    public List<VideoJuego> findAllByNombre(String nombre){
+
+        return new ArrayList<>();
+    }
+
+/*
+    public List<VideoJuego> findAllGeneric(String sql, Object o) {
+        ...
+         Consulta sql: conexión, prepared Statetement, Resulset, while(.next), return
+    }
+*/
+    /*
+    public List<VideoJuego> findAllByYear(Integer year){
+
+        String sql = "SELECT * FROM videojuegos WHERE year = ?";
+        findAllGeneric(sql, year);
+    }
+
+     */
 
 }

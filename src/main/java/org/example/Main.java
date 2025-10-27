@@ -61,17 +61,16 @@ public class Main {
                 System.out.println("No se encontro el videojuego");
             }
         );
+        System.out.println("---------");
+        dao.findAllByNombreContaining("en").forEach(System.out::println);
+
+        System.out.println("---------");
+        dao.findAllByPlataforma("Nintendo Switch").forEach(System.out::println);
+
+
 
     }
 
 
-    /* Métodos tipicos de repositorio - Capa de negocio */
 
-    Optional<VideoJuego> saveOrUpdate(VideoJuego videojuego){
-        return Optional.empty();
-    }
-
-    Boolean exists(VideoJuego videojuego){
-        return false;
-    }
 }
