@@ -3,6 +3,7 @@ package org.example;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Optional;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -44,7 +45,33 @@ public class Main {
             System.out.println("No se encontro el videojuego");
         }
 
+        var juego5 = dao.findById(5);
+        if (juego5.isPresent()){
+            (juego5.get()).setNombre("Sonic 3");
+            dao.update(juego5.get());
+        }
 
 
+        dao.findById(77).ifPresentOrElse(
+            (j)-> {
+                j.setNombre("Fornite - Cesur");
+                dao.update(j).ifPresent(System.out::println);
+            },
+            () -> {
+                System.out.println("No se encontro el videojuego");
+            }
+        );
+
+    }
+
+
+    /* Métodos tipicos de repositorio - Capa de negocio */
+
+    Optional<VideoJuego> saveOrUpdate(VideoJuego videojuego){
+        return Optional.empty();
+    }
+
+    Boolean exists(VideoJuego videojuego){
+        return false;
     }
 }
