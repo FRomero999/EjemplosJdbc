@@ -5,6 +5,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class VideoJuegoDAO implements DAO<VideoJuego> {
 
@@ -12,6 +13,17 @@ public class VideoJuegoDAO implements DAO<VideoJuego> {
 
     public VideoJuegoDAO(DataSource dataSource) {
         this.dataSource = dataSource;
+    }
+
+    private VideoJuego mapper(ResultSet rs) throws SQLException {
+        VideoJuego videojuego = new VideoJuego();
+        videojuego.setId(rs.getInt(1));
+        videojuego.setNombre(rs.getString("nombre"));
+        videojuego.setDesarrollador(rs.getString(3));
+        videojuego.setPlataforma(rs.getString("plataforma"));
+        videojuego.setAño(rs.getInt(4));
+        videojuego.setGenero(rs.getString(5));
+        return videojuego;
     }
 
     @Override
@@ -94,16 +106,9 @@ public class VideoJuegoDAO implements DAO<VideoJuego> {
             Statement stmt = conn.createStatement();
             ResultSet resultado = stmt.executeQuery(sql);
             ){
-            while(resultado.next()){
-                VideoJuego videojuego = new VideoJuego();
-                videojuego.setId(resultado.getInt(1));
-                videojuego.setNombre(resultado.getString("nombre"));
-                videojuego.setDesarrollador(resultado.getString(3));
-                videojuego.setPlataforma(resultado.getString("plataforma"));
-                videojuego.setAño(resultado.getInt(4));
-                videojuego.setGenero(resultado.getString(5));
-                listado.add(videojuego);
-            }
+
+            while(resultado.next()) listado.add( mapper(resultado) );
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -161,14 +166,7 @@ public class VideoJuegoDAO implements DAO<VideoJuego> {
             stmt.setString(1, nombre);
             ResultSet resultado = stmt.executeQuery();
             if(resultado.next()){
-                VideoJuego videojuego = new VideoJuego();
-                videojuego.setId(resultado.getInt(1));
-                videojuego.setNombre(resultado.getString("nombre"));
-                videojuego.setDesarrollador(resultado.getString(3));
-                videojuego.setPlataforma(resultado.getString("plataforma"));
-                videojuego.setAño(resultado.getInt(4));
-                videojuego.setGenero(resultado.getString(5));
-                return Optional.of(videojuego);
+                return Optional.of( mapper(resultado) );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -186,14 +184,7 @@ public class VideoJuegoDAO implements DAO<VideoJuego> {
             stmt.setString(1, plataforma);
             ResultSet resultado = stmt.executeQuery();
             while(resultado.next()){
-                VideoJuego videojuego = new VideoJuego();
-                videojuego.setId(resultado.getInt(1));
-                videojuego.setNombre(resultado.getString("nombre"));
-                videojuego.setDesarrollador(resultado.getString(3));
-                videojuego.setPlataforma(resultado.getString("plataforma"));
-                videojuego.setAño(resultado.getInt(4));
-                videojuego.setGenero(resultado.getString(5));
-                listado.add(videojuego);
+                listado.add( mapper(resultado) );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -209,14 +200,7 @@ public class VideoJuegoDAO implements DAO<VideoJuego> {
             stmt.setString(1, "%"+nombre+"%");
             ResultSet resultado = stmt.executeQuery();
             while(resultado.next()){
-                VideoJuego videojuego = new VideoJuego();
-                videojuego.setId(resultado.getInt(1));
-                videojuego.setNombre(resultado.getString("nombre"));
-                videojuego.setDesarrollador(resultado.getString(3));
-                videojuego.setPlataforma(resultado.getString("plataforma"));
-                videojuego.setAño(resultado.getInt(4));
-                videojuego.setGenero(resultado.getString(5));
-                salida.add(videojuego);
+                salida.add( mapper(resultado) );
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
